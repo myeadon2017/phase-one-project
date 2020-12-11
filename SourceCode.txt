@@ -1,0 +1,268 @@
+Steps:
+1.A user enters the App and enters there directory's location for which they want to manipulate
+
+2.The user then gets prompted with the option to to select what they would like to do add, search, delete, show
+all files or exit the program.
+
+3.Once a selection is made, then the user will be prompted with  the appropriate steps to take in order to make
+there desired needs fulfilled.
+
+-If the user wants to add a file then they would only need to type the name of the file.
+
+-If the user wants to delete a file then they would only need to type the name of the file.
+
+-If the user wants to search a file then they would only need to type the name of the file.
+
+-If the user wants show all the files then it is done automatically.
+
+-If the user wants to exit then after selection it is done automatically.
+
+package phase.end.project1;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
+
+//This class is used for file manipulation
+public class FileClass implements BusinessLogic{
+	
+	//This method is used to show all files in the directory chosen
+	public void showFileList(String root) {
+		Scanner scan = new Scanner (System.in);
+		
+		//An array of strings to store the path names
+		String [] pathnames;
+			File f = new File(root);
+		pathnames = f.list();
+		
+		//This for loop iterates through the names of the paths given
+		for (String pathname : pathnames) {
+			System.out.println(pathname);
+		}
+	}
+	
+	//This method is used to search for the file chosen by the user
+	public void searchFile(String root) {
+		Scanner scan = new Scanner (System.in);
+		System.out.println("Enter the file name you wish to search: ");
+		String fileName = scan.nextLine();
+		File directory = new File(root);
+		
+		//This is used to create the object of the MyFileName class i created
+		MyFilenameFilter filter= new MyFilenameFilter(fileName);
+		
+		//This function will then filter out the filename the user wants
+		String[] flist = directory.list(filter);
+		
+		//This function will return a not found message of the file doesnt exis
+		if(flist == null) {
+			System.out.println("Empty directory or directory does not exists.");
+		}
+		
+		//This function will loop through and display the file if it does exist
+		else {
+			for (int i = 0; i < flist.length; i++) {
+				System.out.println(flist[i]+" found");
+			}
+		}
+	}
+
+	//This is used to add the file by which the user wants to add
+	public void add() {
+		
+		Scanner scan = new Scanner (System.in);
+		System.out.println("please enter the name of the file you would like to add");
+		String fileName = scan.nextLine();
+		
+		//This try catch block will capture the file name and create the file based on users input
+		try {
+			FileOutputStream fout= new FileOutputStream(fileName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//This method will remove a given filename specified by the user
+	public void remove(String root) throws FileMismatchException {
+		Scanner scan = new Scanner(System.in);
+		System.out.println("please enter the name of the file you would like to delete");
+		String fileName = scan.nextLine();
+		File file = new File(root+"\\"+fileName);
+		if(file.exists()) {
+			boolean check = file.delete();
+			System.out.println("File " +fileName+ " deleted " +check);
+		}
+		else {
+			throw new FileMismatchException("File was not found");
+		}
+		//This if statement is used to say if the file can be detected then it will deleted
+	}
+	
+}
+
+
+------------------------------------------------------------------------------------------------------------------
+
+package phase.end.project1;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Scanner;
+
+public class Menu {
+
+	//This method is used to show the menu to the user
+	public void showMenu() {
+		System.out.println("----------------------------------");
+		System.out.println("Welcome to Company Lockers Pvt. Ltd.");
+		System.out.println("----------------------------------");
+	}
+	
+	//This method is used to show the choices and have the user select what they desire
+	public int showChoices() {
+		Scanner scan = new Scanner(System.in);
+		int choice;
+		System.out.println("----------------------------------");
+		System.out.println("Please enter 1 to show all files");
+		System.out.println("Please enter 2 to delete a file");
+		System.out.println("Please enter 3 to add a file");
+		System.out.println("Please enter 4 to search for a file");
+		System.out.println("Please enter 5 to exit application");
+		System.out.println("----------------------------------");
+		
+		choice = Integer.parseInt(scan.nextLine());
+		return choice;
+	}
+	
+	//This is the beginning of my program
+	public static void main(String[] args) throws FileMismatchException {
+		Scanner scan = new Scanner(System.in);
+		Menu menu = new Menu();
+		int selection;
+		menu.showMenu();
+		
+		//This line will prompt the user to type in what directory they wish to use
+		System.out.println("Please enter your root file directory");
+		System.out.println("ex:C:\\Users\\matthew.yeadon\\eclipse-workspace\\phase.end.project1 ");
+		String root = scan.nextLine();
+		File file = new File(root);
+		if(file.exists()) {
+			boolean check = file.exists();
+			System.out.println("File " +root+ " Is a valid path " +check);
+			FileClass myFile = new FileClass();
+			myFile.showFileList(root);
+		}
+		else {
+			throw new FileMismatchException("Root directory was not found");
+		}
+		selection = menu.showChoices();
+		System.out.println(selection);
+		
+		//This while loop is used to iterate though the menu options based on the users selection
+				//If you wish to exit the program then the user would press 5
+		while(selection != 5) {
+		if (selection == 1) {
+			FileClass myFile = new FileClass();
+			myFile.showFileList(root);
+			menu.showMenu();
+			selection = menu.showChoices();
+			System.out.println(selection);
+		}
+		else if(selection == 2) {
+			FileClass myFile = new FileClass();
+			myFile.remove(root);
+			menu.showMenu();
+			selection = menu.showChoices();
+			System.out.println(selection);
+		}
+	
+		else if (selection == 3) {
+			FileClass myFile = new FileClass();
+			myFile.add();
+			menu.showMenu();
+			selection = menu.showChoices();
+			System.out.println(selection);
+		}
+		else if (selection == 4) {
+			FileClass myFile = new FileClass();
+			myFile.searchFile(root);
+			menu.showMenu();
+			selection = menu.showChoices();
+			System.out.println(selection);
+		}
+		else {
+			System.out.println("Not a valid selection");
+			menu.showMenu();
+			selection = menu.showChoices();
+			System.out.println(selection);
+		}
+	
+	}
+		//This option will be displayed if the program exits via entering 5
+		System.out.println("Thank you for using Company Lockers Pvt. Ltd.");
+	}
+}
+
+
+
+---------------------------------------------------------------------------------------------------------------
+
+package phase.end.project1;
+
+import java.io.File;
+import java.io.FilenameFilter;
+
+//This calls will be used for the FilenameFilter implementation
+public class MyFilenameFilter implements FilenameFilter {
+
+	//This declaration is where the file will have a string for what file the user wishes to search
+	String initials;
+	
+	//This is the method that gets called when executing in the FileClass.java
+	public MyFilenameFilter(String initials) {
+		this.initials = initials;
+	}
+	//This is an inherited abstract method needed with the implementation of FilenameFilte
+	public boolean accept(File dir, String name) {
+		return name.startsWith(initials);
+	}
+}
+
+------------------------------------------------------------------------------------------------------------------------
+
+package phase.end.project1;
+
+//This class is used to create a custom exception for files not being found
+public class FileMismatchException extends Exception {
+
+	public FileMismatchException(String message) {
+		super(message);
+		
+	}
+	}
+	
+
+------------------------------------------------------------------------------------------------------------------------
+
+package phase.end.project1;
+
+//This interface is for the business logic of all the methods used in the application
+public interface BusinessLogic {
+
+	public void showFileList(String root);
+	
+	public void searchFile(String root);
+	
+	public void add();
+	
+	public void remove(String root) throws FileMismatchException;
+}
+
+
+
+
